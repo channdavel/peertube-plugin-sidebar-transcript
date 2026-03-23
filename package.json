@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Adds a transcript sidebar to PeerTube embeds",
   "author": "ULS",
-  "homepage": "https://github.com/channdavel/PeerTube",
-  "bugs": "https://github.com/channdavel/PeerTube/issues",
+  "homepage": "https://github.com/channdavel/peertube-plugin-sidebar-transcript",
+  "bugs": "https://github.com/channdavel/peertube-plugin-sidebar-transcript/issues",
   "engine": {
     "peertube": ">=6.0.0"
   },
