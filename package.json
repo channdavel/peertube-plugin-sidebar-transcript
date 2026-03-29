@@ -1,6 +1,6 @@
 {
   "name": "peertube-plugin-sidebar-transcript",
-  "version": "1.0.1",
+  "version": "0.0.7",
   "description": "Adds a transcript sidebar to PeerTube embeds",
   "author": "ULS",
   "homepage": "https://github.com/channdavel/peertube-plugin-sidebar-transcript",
@@ -9,18 +9,27 @@
     "peertube": ">=6.0.0"
   },
   "library": "./main.js",
+  "scripts": {
+    "build": "node ./scripts/build.js",
+    "prepare": "npm run build"
+  },
   "clientScripts": [
     {
-      "script": "dist/main.js",
+      "script": "dist/common-client-plugin.js",
       "scopes": [
-        "embed",
-        "common"
+        "embed"
       ]
     }
   ],
   "css": [
-    "dist/stylesheet.css"
+    "dist/style.css"
   ],
   "staticDirs": {},
-  "translations": {}
+  "translations": {},
+  "dependencies": {
+    "@plussub/srt-vtt-parser": "^2.0.5"
+  },
+  "devDependencies": {
+    "esbuild": "^0.14.36"
+  }
 }

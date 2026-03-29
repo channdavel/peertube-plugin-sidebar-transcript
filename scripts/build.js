@@ -1,20 +1,26 @@
+const fs = require('fs/promises')
 const path = require('path')
 const esbuild = require('esbuild')
 
-const clientFiles = [
-  'common-client-plugin.js'
-]
+const rootDir = path.resolve(__dirname, '..')
+const distDir = path.resolve(rootDir, 'dist')
 
-const configs = clientFiles.map(f => ({
-  entryPoints: [ path.resolve(__dirname, '..', 'client', f) ],
+const config = {
+  entryPoints: [ path.resolve(rootDir, 'client', 'common-client-plugin.js') ],
   bundle: true,
   minify: true,
-  format: 'esm',
-  target: 'safari11',
-  outfile: path.resolve(__dirname, '..', 'dist', f),
-}))
+  format: 'cjs',
+  platform: 'browser',
+  target: [ 'es2020' ],
+  outfile: path.resolve(distDir, 'common-client-plugin.js')
+}
 
-const promises = configs.map(c => esbuild.build(c))
-
-Promise.all(promises)
+Promise.all([
+  fs.mkdir(distDir, { recursive: true }),
+  esbuild.build(config)
+])
+  .then(() => fs.copyFile(
+    path.resolve(rootDir, 'assets', 'style.css'),
+    path.resolve(distDir, 'style.css')
+  ))
   .catch(() => process.exit(1))
