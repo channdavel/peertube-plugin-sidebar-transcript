@@ -1,6 +1,6 @@
 {
   "name": "peertube-plugin-sidebar-transcript",
-  "version": "0.0.7",
+  "version": "1.0.1",
   "description": "Adds a transcript sidebar to PeerTube embeds",
   "author": "ULS",
   "homepage": "https://github.com/channdavel/peertube-plugin-sidebar-transcript",
