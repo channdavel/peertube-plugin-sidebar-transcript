@@ -9,7 +9,7 @@ const config = {
   entryPoints: [ path.resolve(rootDir, 'client', 'common-client-plugin.js') ],
   bundle: true,
   minify: true,
-  format: 'cjs',
+  format: 'esm',
   platform: 'browser',
   target: [ 'es2020' ],
   outfile: path.resolve(distDir, 'common-client-plugin.js')

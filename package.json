@@ -26,9 +26,6 @@
   ],
   "staticDirs": {},
   "translations": {},
-  "dependencies": {
-    "@plussub/srt-vtt-parser": "^2.0.5"
-  },
   "devDependencies": {
     "esbuild": "^0.14.36"
   }
