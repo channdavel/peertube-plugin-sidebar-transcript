@@ -1,3 +1,5 @@
+import { parse } from '@plussub/srt-vtt-parser'
+
 function register ({ registerHook }) {
   registerHook({
     target: 'action:embed.player.loaded',
@@ -29,70 +31,41 @@ function isTranscriptEnabled () {
 }
 
 function getVideoUuidFromUrl () {
-  // Embed URLs look like /videos/embed/{uuid} or /video-playlists/embed/{uuid}
-  const parts = window.location.pathname.split('/')
+  var parts = window.location.pathname.split('/')
   return parts[parts.length - 1] || null
 }
 
 async function fetchCaptions (uuid) {
-  const res = await fetch('/api/v1/videos/' + encodeURIComponent(uuid) + '/captions')
+  var res = await fetch('/api/v1/videos/' + encodeURIComponent(uuid) + '/captions')
   if (!res.ok) return []
 
-  const payload = await res.json()
-  const captions = payload.data || payload
+  var payload = await res.json()
+  var captions = payload.data || payload
   if (!Array.isArray(captions) || captions.length === 0) return []
 
-  const captionPath = captions[0].captionPath || captions[0].path || captions[0].fileUrl
+  var captionPath = captions[0].captionPath || captions[0].path || captions[0].fileUrl
   if (!captionPath) return []
 
-  const captionUrl = new URL(captionPath, window.location.origin).href
-  const fileRes = await fetch(captionUrl)
+  var captionUrl = new URL(captionPath, window.location.origin).href
+  var fileRes = await fetch(captionUrl)
   if (!fileRes.ok) return []
 
-  const text = await fileRes.text()
-  return parseVtt(text)
-}
+  var text = await fileRes.text()
+  var result = parse(text)
+  var entries = result.entries || []
 
-function parseVtt (text) {
-  var segments = []
-  var blocks = text.replace(/\r\n/g, '\n').split(/\n\n+/)
-
-  for (var i = 0; i < blocks.length; i++) {
-    var lines = blocks[i].trim().split('\n')
-    var timeLine = null
-    var textLines = []
-
-    for (var j = 0; j < lines.length; j++) {
-      if (lines[j].indexOf('-->') !== -1) {
-        timeLine = lines[j]
-      } else if (timeLine && lines[j].trim() !== '' && !/^\d+$/.test(lines[j].trim())) {
-        textLines.push(lines[j].trim())
+  return entries
+    .map(function (entry) {
+      var start = Number(entry.from)
+      var txt = typeof entry.text === 'string' ? entry.text.trim() : ''
+      if (!Number.isFinite(start) || !txt) return null
+      return {
+        start: start / 1000,
+        startFormatted: formatDuration(start / 1000),
+        text: txt
       }
-    }
-
-    if (timeLine && textLines.length > 0) {
-      var startStr = timeLine.split('-->')[0].trim()
-      var start = parseTimestamp(startStr)
-      segments.push({
-        start: start,
-        startFormatted: formatDuration(start),
-        text: textLines.join(' ').replace(/<[^>]+>/g, '')
-      })
-    }
-  }
-
-  return segments
-}
-
-function parseTimestamp (str) {
-  str = str.replace(',', '.')
-  var parts = str.split(':')
-  if (parts.length === 3) {
-    return parseFloat(parts[0]) * 3600 + parseFloat(parts[1]) * 60 + parseFloat(parts[2])
-  } else if (parts.length === 2) {
-    return parseFloat(parts[0]) * 60 + parseFloat(parts[1])
-  }
-  return 0
+    })
+    .filter(Boolean)
 }
 
 function formatDuration (seconds) {
@@ -108,7 +81,6 @@ function buildTranscriptSidebar (player, segments) {
   var playerEl = player.el()
   if (!playerEl) return
 
-  // --- Sidebar panel ---
   var sidebar = document.createElement('div')
   sidebar.className = 'vjs-transcript-menu'
 
@@ -173,7 +145,6 @@ function buildTranscriptSidebar (player, segments) {
   sidebar.appendChild(segmentsContainer)
   playerEl.appendChild(sidebar)
 
-  // --- Control bar button ---
   var btn = document.createElement('button')
   btn.className = 'vjs-transcript-button vjs-control vjs-button'
   btn.type = 'button'
@@ -190,7 +161,6 @@ function buildTranscriptSidebar (player, segments) {
     }
   }
 
-  // --- Toggle open/close ---
   var isOpen = false
 
   function openSidebar () {
@@ -210,7 +180,6 @@ function buildTranscriptSidebar (player, segments) {
 
   closeBtn.addEventListener('click', closeSidebar)
 
-  // --- Highlight active segment ---
   player.on('timeupdate', function () {
     var currentTime = player.currentTime()
     var activeEl = null

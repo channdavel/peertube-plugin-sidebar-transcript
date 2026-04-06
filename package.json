@@ -28,5 +28,8 @@
   "translations": {},
   "devDependencies": {
     "esbuild": "^0.14.36"
+  },
+  "dependencies": {
+    "@plussub/srt-vtt-parser": "^2.0.5"
   }
 }
